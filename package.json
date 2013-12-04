@@ -1,0 +1,15 @@
+{
+  "name": "reform",
+  "version": "2.3.0",
+  "description": "Forms. Reinvent the wheel.",
+  "homepage": "https://github.com/Se7enSky/reform",
+  "devDependencies": {
+    "grunt": "~0.4.2",
+    "grunt-cli": "~0.1.11",
+    "grunt-contrib-coffee": "~0.7.0",
+    "grunt-contrib-clean": "~0.5.0",
+    "grunt-contrib-watch": "~0.5.3",
+    "grunt-contrib-uglify": "~0.2.7",
+    "grunt-nodestatic": "~0.1.2"
+  }
+}

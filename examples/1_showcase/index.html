@@ -1,0 +1,100 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>reform showcase</title>
+		<style>
+			form { border: 1px solid gray; }
+			form.submitted-success { border: 1px solid green; }
+			form.submitted-invalid { border: 1px solid red; }
+			form.submitting { opacity: 0.5; }
+			
+			input.invalid { border-color: red; }
+			
+			.error { padding: 0 10px; color: red; display: none; }
+			.error.active { display: inline; }
+			
+			.success-message { display: none; border: 1px solid green; }
+			.success-message.active { display: block; }
+
+			#form-hello-world-2.submitted-success { display: none; }
+		</style>
+		<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+		<script src="http://malsup.github.io/min/jquery.form.min.js"></script>
+		<script src="../../frontend/jquery-reform.min.js"></script>
+		<script>
+			$(function(){
+				$("form").reform({
+					actionPrefix: false,
+					ajax: true,
+					invalidInputClass: 'invalid',
+					invalidInputParentClass: false,
+					activeErrorClass: 'active',
+					activeErrorParentClass: false,
+					submittingFormClass: 'submitting',
+					invalidFormClass: 'submitted-invalid',
+					successFormClass: 'submitted-success',
+					successMessageClass: 'active',
+					errorResponseCodes: ['validation_error']
+				})
+
+				// form element always accessible on event.target
+				$(document).on({
+					'reform.response': function(event, data){
+						console.log("reform.response", data.err, data.res)
+					},
+					'reform.success': function(event, res){
+						console.log("reform.success", res, event.target)
+					},
+					'reform.submitting': function(event){
+						console.log("reform.submitting")
+					},
+					'reform.beforeSubmit': function(event, data){
+						console.log("reform.beforeSubmit", data)
+					},
+					'reform.validationError': function(event, errors){
+						console.log("reform.validationError", errors)
+					},
+					'reform.unknownError': function(event, error){
+						console.log("reform.validationError", error)
+					}
+				});
+			})
+		</script>
+	</head>
+	<body>
+		<h1>reform showcase</h1>
+
+		<h2>Hello world</h2>
+		<form action="responses/hello-world.json" method="get">
+			Your name: <input type="text" name="name">
+			<input type="submit">
+		</form>
+
+		<h2>With success message</h2>
+		<form id="form-hello-world-2" action="responses/hello-world.json" method="get">
+			Your name: <input type="text" name="name">
+			<input type="submit">
+		</form>
+		<div id="form-hello-world-success" class="success-message" data-success-message-for="#form-hello-world-2">
+			form submitted okay
+		</div>
+		
+		<h2>Validation error 1</h2>
+		<form action="responses/validation-error-1.json" method="get">
+			Your name: <input type="text" name="name">
+			<div class="error" data-error-for="name">invalid name</div>
+			<input type="submit">
+		</form>
+
+		<h2>Validation error 2</h2>
+		<form action="responses/validation-error-1.json" method="get">
+			Your name: <input type="text" name="name">
+			<div class="error" data-error-for="name">some error in this field</div>
+			<div class="error" data-error-for="name required">name is required</div>
+			<div class="error" data-error-for="name valid">invalid name</div>
+			<input type="submit">
+		</form>
+
+	</body>
+</html>

@@ -1,0 +1,8 @@
+{
+	"code": "validation_error",
+	"errors": {
+		"name": {
+			"required": true
+		}
+	}
+}

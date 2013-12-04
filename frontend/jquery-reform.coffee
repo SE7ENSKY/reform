@@ -1,12 +1,12 @@
 ###
 @name jquery-reform
 @description Forms. Reinvent the wheel.
-@version 2.0.0
+@version 2.3.0
 @author Se7enSky studio <info@se7ensky.com>
 @dependencies
 	- [jQuery Ajax Form](http://malsup.com/jquery/form/)
 ###
-###! jquery-reform 2.0.0 http://github.com/Se7enSky/jquery-reform###
+###! jquery-reform 2.3.0 http://github.com/Se7enSky/jquery-reform###
 
 plugin = ($) ->
 
@@ -16,12 +16,15 @@ plugin = ($) ->
 		defaults:
 			actionPrefix: off
 			ajax: on
-			invalidInputClass: 'invalid'
-			invalidInputParentClass: 'invalid-parent'
+			invalidInputClass: 'invalid-field'
+			invalidInputParentClass: 'invalid-field-parent'
 			activeErrorClass: 'active-error'
 			activeErrorParentClass: 'active-error-parent'
-			invalidFormClass: 'invalid-form'
-			submittingClass: 'submitting'
+			submittingFormClass: 'submitting'
+			invalidFormClass: 'submitted-invalid'
+			successFormClass: 'submitted-success'
+			successMessageClass: 'active-success-message'
+			errorResponseCodes: ['ValidationError', 'validation_error', 'validationError', 'invalid', 'validation']
 
 		constructor: (@el, options) ->
 			@$el = $ @el
@@ -30,6 +33,9 @@ plugin = ($) ->
 
 			@$el.on
 				'reform.validationError': (event, errors) => @showErrors errors
+				'reform.success': (event, res) =>
+					@$el.addClass @options.successFormClass if @options.successFormClass
+					@findSuccessMessages().addClass @options.successMessageClass if @options.successMessageClass
 			@initAjaxForm() if @options.ajax
 
 		startedSubmitting: ->
@@ -40,6 +46,17 @@ plugin = ($) ->
 			@submitting = no
 			@$el.removeClass @options.submittingClass if @options.submittingClass
 
+		findSuccessMessages: ->
+			result = $([])
+			formEl = @el
+			$("[data-success-message-for]").each ->
+				{successMessageFor} = $(@).data()
+				forForm = $(successMessageFor).get(0)
+				if formEl is forForm
+					result = result.add $(@)
+			console.log result
+			result
+
 		beforeSubmit: (formData) ->
 			return off if @submitting
 			@clearErrors()
@@ -48,11 +65,12 @@ plugin = ($) ->
 			on
 
 		clearErrors: ->
+			@$el.removeClass @options.successFormClass if @options.successFormClass
 			@$el.removeClass @options.invalidFormClass if @options.invalidFormClass
 			if @options.activeErrorClass
-				@$el.find("[data-error-for]").addClass @options.activeErrorClass
+				@$el.find("[data-error-for]").removeClass @options.activeErrorClass
 			if @options.activeErrorParentClass
-				@$el.find("[data-error-for]").parent().addClass @options.activeErrorParentClass
+				@$el.find("[data-error-for]").parent().removeClass @options.activeErrorParentClass
 			if @options.invalidInputParentClass
 				@$el.find("input.#{@options.invalidInputClass}").parent().removeClass @options.invalidInputParentClass
 			@$el.find("input.#{@options.invalidInputClass}").removeClass @options.invalidInputClass
@@ -95,13 +113,17 @@ plugin = ($) ->
 
 		handleResponse: (err, res) ->
 			@stoppedSubmitting()
-			@$el.trigger 'reform.response', err, res
+			@$el.trigger 'reform.response', err: err, res: res
+			if res?.code in @options.errorResponseCodes or res?.errors
+				err = res
+				res = null
+
 			if err
-				if err?.code in ['ValidationError', 'validation_error', 'validationError', 'invalid', 'validation']
+				if err?.code in @options.errorResponseCodes
 					@$el.trigger 'reform.validationError', err.errors or []
 				else
 					@$el.trigger 'reform.unknownError', err
-			else
+			else			
 				@$el.trigger 'reform.success', res
 
 		initAjaxForm: ->
