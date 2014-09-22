@@ -54,7 +54,7 @@ plugin = ($) ->
 				forForm = $(successMessageFor).get(0)
 				if formEl is forForm
 					result = result.add $(@)
-			console.log result
+			# console.log result
 			result
 
 		beforeSubmit: (formData) ->
@@ -91,7 +91,7 @@ plugin = ($) ->
 					@$el.find("[data-error-for='#{fieldName}']").parent().addClass @options.activeErrorParentClass
 
 				fixedFieldName = fieldName.replace ///\.([^\.]+)///g, '[$1]'
-				console.log fixedFieldName
+				# console.log fixedFieldName
 				$field = @$el.find("[name='#{fixedFieldName}']")
 				
 				$field.addClass @options.invalidInputClass
