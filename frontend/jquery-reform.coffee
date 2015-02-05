@@ -39,12 +39,12 @@ plugin = ($) ->
 			@initAjaxForm() if @options.ajax
 
 		startedSubmitting: ->
-			@$el.addClass @options.submittingClass if @options.submittingClass
+			@$el.addClass @options.submittingFormClass if @options.submittingFormClass
 			@submitting = yes
 			@$el.trigger 'reform.submitting'
 		stoppedSubmitting: ->
 			@submitting = no
-			@$el.removeClass @options.submittingClass if @options.submittingClass
+			@$el.removeClass @options.submittingFormClass if @options.submittingFormClass
 
 		findSuccessMessages: ->
 			result = $([])
